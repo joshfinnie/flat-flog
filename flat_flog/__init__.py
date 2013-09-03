@@ -1,0 +1,5 @@
+__title__ = 'flat_flog'
+__version__ = '0.1'
+__author__ = 'Josh Finnie'
+__license__ = 'MIT'
+__copyright__ = 'Copyright 2013 Josh Finnie'
