@@ -71,6 +71,7 @@ List of things I want to get done:
 
 * Make tags work better.
 * Implement time-sorted archive (maybe...)
+* Add `Config` file for more personalization.
 
 Find more todo items [here](https://github.com/joshfinnie/flat-flog/issues) and feel free to submit [Pull Requests](https://github.com/joshfinnie/flat-flog/pulls)!
 
