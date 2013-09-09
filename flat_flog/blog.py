@@ -15,18 +15,10 @@ from flask_frozen import (
     Freezer
     )
 
-DEBUG = True
-FLATPAGES_AUTO_RELOAD = DEBUG
-FLATPAGES_EXTENSION = '.md'
-FLATPAGES_ROOT = '_content'
-POST_DIR = '_posts'
-PAGE_DIR = '_pages'
-FREEZER_DESTINATION = '../_site'
-
 app = Flask(__name__)
 flatpages = FlatPages(app)
 freezer = Freezer(app)
-app.config.from_object(__name__)
+app.config.from_pyfile('settings.cfg')
 
 
 @app.route('/static/css/pygments.css')
@@ -54,7 +46,7 @@ def inject_pages():
 @app.route('/')
 def home():
     """ Renders the home page as a regular `page` """
-    path = '{}/{}'.format(PAGE_DIR, 'home')
+    path = '{}/{}'.format(app.config['PAGE_DIR'], 'home')
     page = flatpages.get_or_404(path)
     return render_template('page.html', page=page)
 
@@ -68,7 +60,7 @@ def home():
 @app.route('/posts/')
 def posts():
     """ Renders the list of blog posts. """
-    posts = [p for p in flatpages if p.path.startswith(POST_DIR)]
+    posts = [p for p in flatpages if p.path.startswith(app.config['POST_DIR'])]
     posts.sort(key=lambda item: item['date'], reverse=False)
     return render_template('posts.html', posts=posts)
 
@@ -76,7 +68,7 @@ def posts():
 @app.route('/posts/<name>/')
 def post(name):
     """ Renders an individual blog post """
-    path = '{}/{}'.format(POST_DIR, name)
+    path = '{}/{}'.format(app.config['POST_DIR'], name)
     post = flatpages.get_or_404(path)
     return render_template('post.html', post=post)
 
@@ -84,7 +76,7 @@ def post(name):
 @app.route('/tags/<name>/')
 def tag(name):
     """ Renders a list of blog posts per tag `name` """
-    posts = [p for p in flatpages if p.path.startswith(POST_DIR) and name in p.meta['tags']]
+    posts = [p for p in flatpages if p.path.startswith(app.config['POST_DIR']) and name in p.meta['tags']]
     posts.sort(key=lambda item: item['date'], reverse=False)
     return render_template('tag.html', tag=name, posts=posts)
 
@@ -92,13 +84,14 @@ def tag(name):
 @app.route("/<name>/")
 def page(name):
     """ Renders a `page` """
-    path = '{}/{}'.format(PAGE_DIR, name)
+    path = '{}/{}'.format(app.config['PAGE_DIR'], name)
     page = flatpages.get_or_404(path)
     return render_template('page.html', page=page)
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'build':
+        FREEZER_DESTINATION = os.path.dirname(os.path.abspath(__file__))
         freezer.freeze()
     else:
-        app.run(host='0.0.0.0', debug=DEBUG)
+        app.run(host='0.0.0.0', debug=app.config.get('DEBUG'))
